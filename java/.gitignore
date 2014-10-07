@@ -1,0 +1,10 @@
+bin
+*/bin
+target
+*/target
+.settings
+*/.settings
+.classpath
+*/.classpath
+.project
+*.project
