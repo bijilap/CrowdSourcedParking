@@ -16,9 +16,8 @@ public class Parking {
     @GeneratedValue(generator="increment")
     @GenericGenerator(name="increment", strategy = "increment")
     private Long id;
-    
-
-    private String name;
+	
+	private String name;
     
     @Type(type="org.hibernate.spatial.GeometryType")
     private Point location;

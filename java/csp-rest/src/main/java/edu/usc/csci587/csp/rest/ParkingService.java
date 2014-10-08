@@ -30,7 +30,7 @@ public class ParkingService {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/{id}")
-	public Response updateUserLocation(@PathParam("id") String id)
+	public Response getParking(@PathParam("id") String id)
 	{
 	
 		EntityManager em = JPAUtil.createEntityManager();
