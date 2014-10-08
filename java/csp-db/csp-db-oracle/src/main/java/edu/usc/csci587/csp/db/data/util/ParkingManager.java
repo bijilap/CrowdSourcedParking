@@ -40,7 +40,7 @@ public class ParkingManager {
         em.close();
     }
 
-    private Geometry wktToGeometry(String wktPoint) {
+    public static Geometry wktToGeometry(String wktPoint) {
         WKTReader fromText = new WKTReader(new GeometryFactory(new PrecisionModel(), 8307));
        // WKTReader fromText = new WKTReader();
         Geometry geom = null;
