@@ -28,13 +28,20 @@ public class UserService {
 		User user = em.find(User.class, id);
 		em.getTransaction().commit();
 		em.close();
-		JSONObject userJSON = new JSONObject();
-		userJSON.put("id",user.getId());
-		userJSON.put("timestamp", user.getTimestamp());
-		userJSON.put("name", user.getName());
-		userJSON.put("location", user.getLocation());
-		
-		return Response.status(200).entity(userJSON.toString()).build();
+		if(user != null)
+		{
+			JSONObject userJSON = new JSONObject();
+			userJSON.put("id",user.getId());
+			userJSON.put("timestamp", user.getTimestamp());
+			userJSON.put("name", user.getName());
+			userJSON.put("location", user.getLocation());
+			
+			return Response.status(200).entity(userJSON.toString()).build();
+		}
+		else
+		{
+			return Response.status(404).build();
+		}
 	}
 	
 	
@@ -48,10 +55,17 @@ public class UserService {
 		User user = em.find(User.class, id);
 		em.getTransaction().commit();
 		em.close();
-		JSONObject userJSON = new JSONObject();
-		userJSON.put("timestamp", user.getTimestamp());
-		userJSON.put("location", user.getLocation());
-		return Response.status(200).entity(userJSON.toString()).build();
+		if(user != null)
+		{
+			JSONObject userJSON = new JSONObject();
+			userJSON.put("timestamp", user.getTimestamp());
+			userJSON.put("location", user.getLocation());
+			return Response.status(200).entity(userJSON.toString()).build();
+		}
+		else
+		{
+			return Response.status(404).build();
+		}
 	}
 	
 	@POST
@@ -62,6 +76,11 @@ public class UserService {
 		EntityManager em = JPAUtil.createEntityManager();
 		em.getTransaction().begin();
 		User user = em.find(User.class, id);
+		if(user == null)
+		{
+			user = new User();
+			user.setId(id);
+		}
 		user.setTimestamp(timestamp);
 		user.setLocation((Point)ParkingManager.wktToGeometry(locationWKT));
 		em.persist(user);

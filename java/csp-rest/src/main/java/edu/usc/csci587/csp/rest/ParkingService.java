@@ -94,9 +94,13 @@ public class ParkingService {
 	    	{
 	    		return Response.status(200).entity(parkingGarages.toString()).build();
 	    	}
-	    	else
+	    	else if(parkingGarages.length() == 1)
 	    	{
 	    		return Response.status(200).entity(parkingGarages.get(0).toString()).build(); 
+	    	}
+	    	else
+	    	{
+	    		return Response.status(200).entity("[]").build();
 	    	}
 	    	
 	    }
