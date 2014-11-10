@@ -7,7 +7,7 @@ import javax.persistence.Id;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
-import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Geometry;
 
 @Entity
 public class Parking {
@@ -20,7 +20,13 @@ public class Parking {
 	private String name;
     
     @Type(type="org.hibernate.spatial.GeometryType")
-    private Point location;
+    private Geometry location;
+    
+    private Long averagetime;
+    private Long capacity;
+    private Double pricepermin;
+    private Double priceperhour;
+    private Double priceperday;
     
     public Long getId() {
 		return id;
@@ -38,13 +44,51 @@ public class Parking {
 		this.name = name;
 	}
 
-	public Point getLocation() {
+	public Geometry getLocation() {
 		location.setSRID(8307);
 		return location;
 	}
 
-	public void setLocation(Point location) {
+	public void setLocation(Geometry location) {
 		this.location = location;
 	}
+	public Long getAverageTime() {
+		return averagetime;
+	}
 
+	public void setAverageTime(Long averagetime) {
+		this.averagetime = averagetime;
+	}
+
+	public Long getCapacity() {
+		return capacity;
+	}
+
+	public void setCapacity(Long capacity) {
+		this.capacity = capacity;
+	}
+
+	public Double getPricePerMin() {
+		return pricepermin;
+	}
+
+	public void setPricePerMin(Double pricepermin) {
+		this.pricepermin = pricepermin;
+	}
+
+	public Double getPricePerHour() {
+		return priceperhour;
+	}
+
+	public void setPricePerHour(Double priceperhour) {
+		this.priceperhour = priceperhour;
+	}
+
+	public Double getPricePerDay() {
+		return priceperday;
+	}
+
+	public void setPricePerDay(Double priceperday) {
+		this.priceperday = priceperday;
+	}
 }

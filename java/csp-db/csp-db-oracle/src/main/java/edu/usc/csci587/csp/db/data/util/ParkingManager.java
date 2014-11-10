@@ -16,7 +16,7 @@ public class ParkingManager {
     	ParkingManager mgr = new ParkingManager();
 
         if (args[0].equals("store")) {
-            mgr.createAndStoreParking("USC Parking Garage 3",  assemble(args));
+            mgr.createAndStoreParking("USC Parking Lot 6",  assemble(args));
         }
         JPAUtil.close();
     }
