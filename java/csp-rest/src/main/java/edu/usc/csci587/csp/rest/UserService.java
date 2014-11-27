@@ -52,9 +52,25 @@ public class UserService {
 	}
 	
 	@GET
+	@Path("/query/parking/{id}")
+	public Response getUsersNearParkingGarage(@PathParam("id") String id)
+	{
+		JSONObject parkingJSON = ParkingService.getParkingJSON(id);
+		if(parkingJSON == null)
+		{
+			return Response.status(404).build();
+		}
+		return searchForUsersDirectly(parkingJSON.getString("location"), 1000.0);
+	}
+	
+	@GET
 	@Path("/query/point")
 	public Response searchForUsers(@QueryParam("point") String point, @QueryParam("radius") Double radius)
 	{
+		return searchForUsersDirectly(point, radius);
+	}
+
+	private Response searchForUsersDirectly(String point, Double radius) {
 		EntityManager em = JPAUtil.createEntityManager();
 		Query query = getSearchForUserQuery(point, radius, em);
 	    List untypedResults = query.getResultList();
@@ -113,7 +129,7 @@ public class UserService {
 		return query;
 	}
 	
-	private Response getUsersFromQuery(List untypedResults) {
+	protected static Response getUsersFromQuery(List untypedResults) {
 		JSONArray users = new JSONArray();
 	    if(untypedResults != null)
 	    {
@@ -147,7 +163,7 @@ public class UserService {
 		return Response.status(404).build();
 	}
 	
-	private JSONObject translateUserToJSONObject(User u) {
+	protected static JSONObject translateUserToJSONObject(User u) {
 		JSONObject user = new JSONObject();
 		user.put("id", u.getId());
 		user.put("location", u.getLocation().toText());

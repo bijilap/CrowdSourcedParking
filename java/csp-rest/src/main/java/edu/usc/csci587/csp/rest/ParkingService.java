@@ -99,6 +99,16 @@ public class ParkingService {
 	public Response getParking(@PathParam("id") String id)
 	{
 	
+		JSONObject parkingGarage = getParkingJSON(id);
+		if(parkingGarage != null)
+		{
+			return Response.status(200).entity(parkingGarage.toString()).build();
+		}
+		return Response.status(404).build();
+	}
+
+	public static JSONObject getParkingJSON(String id)
+	{
 		EntityManager em = JPAUtil.createEntityManager();
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Parking> criteria = cb.createQuery(Parking.class);
@@ -110,11 +120,10 @@ public class ParkingService {
 		Parking p = results.iterator().next();
 		if(p != null)
 		{
-		JSONObject parkingGarage = translateParkingToJSONObject(p);
-		
-		return Response.status(200).entity(parkingGarage.toString()).build();
+			return translateParkingToJSONObject(p);
 		}
-		return Response.status(404).build();
+		return null;
+		
 	}
 	
 	@GET
@@ -205,7 +214,7 @@ public class ParkingService {
 		return Response.status(404).build();
 	}
 	
-	private Parking translateJSONObjectToParking(JSONObject o)
+	protected static Parking translateJSONObjectToParking(JSONObject o)
 	{
 		Parking parking = new Parking();
 		if(o.has("id"))
@@ -239,7 +248,7 @@ public class ParkingService {
 		return parking;
 	}
 
-	private Parking mergeJSONObjectToParking(Parking parking, JSONObject parkingAsJSON) {
+	protected static Parking mergeJSONObjectToParking(Parking parking, JSONObject parkingAsJSON) {
 		Parking tempParking = translateJSONObjectToParking(parkingAsJSON);
 		if(tempParking.getAverageTime() != null)
 		{
@@ -272,7 +281,7 @@ public class ParkingService {
 		return parking;
 	}
 	
-	private JSONObject translateParkingToJSONObject(Parking p) {
+	protected static JSONObject translateParkingToJSONObject(Parking p) {
 		JSONObject parkingGarage = new JSONObject();
 		parkingGarage.put("id", p.getId());
 		parkingGarage.put("location", p.getLocation().toText());
