@@ -119,6 +119,19 @@ public class ParkingService {
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/query/name")
+	public Response getParkingByName(@QueryParam("name") String name, @QueryParam("point") String point, @QueryParam("radius") Double radius)
+	{
+	
+		EntityManager em = JPAUtil.createEntityManager();
+		Query query = getSearchForParkingGarageByNameQuery(point, radius, name, em);
+		
+	    List untypedResults = query.getResultList();
+	    return getParkingGaragesFromQuery(untypedResults);
+	}
+	
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/query/polygon")
 	public Response searchForParkingGarages(@QueryParam("polygon") String polygon)
 	{
@@ -127,6 +140,7 @@ public class ParkingService {
 		parkingGarage.put("id", 1);
 		return Response.status(200).entity(parkingGarage.toString()).build();
 	}
+	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/query/point")
@@ -135,12 +149,30 @@ public class ParkingService {
 		System.out.println("looking in " + point + " with radius " + radius );
 		
 		EntityManager em = JPAUtil.createEntityManager();
+		Query query = getSearchForParkingGarageQuery(point, radius, em);
+	    List untypedResults = query.getResultList();
+	    
+	    return getParkingGaragesFromQuery(untypedResults);
+	}
+	
+	private Query getSearchForParkingGarageByNameQuery(String point, Double radius, String name,
+			EntityManager em) {
+		Query query = em.createQuery("select p from Parking p where p.name=:name and distance(p.location, :query_point) < :radius", Parking.class);
+	    query.setParameter("query_point", ParkingManager.wktToGeometry(point));
+	    query.setParameter("radius", radius);
+	    query.setParameter("name", name);
+		return query;
+	}
+	
+	private Query getSearchForParkingGarageQuery(String point, Double radius,
+			EntityManager em) {
 		Query query = em.createQuery("select p from Parking p where distance(p.location, :query_point) < :radius", Parking.class);
 	    query.setParameter("query_point", ParkingManager.wktToGeometry(point));
 	    query.setParameter("radius", radius);
-	    List untypedResults = query.getResultList();
-	    
-	    JSONArray parkingGarages = new JSONArray();
+		return query;
+	}
+	private Response getParkingGaragesFromQuery(List untypedResults) {
+		JSONArray parkingGarages = new JSONArray();
 	    if(untypedResults != null)
 	    {
 	    	Iterator untypedResultsIterator = untypedResults.iterator();

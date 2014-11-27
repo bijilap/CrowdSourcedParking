@@ -1,17 +1,24 @@
 package edu.usc.csci587.csp.rest;
 
+import java.util.Iterator;
+import java.util.List;
+
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.vividsolutions.jts.geom.Point;
 
+import edu.usc.csci587.csp.db.data.Parking;
 import edu.usc.csci587.csp.db.data.User;
 import edu.usc.csci587.csp.db.data.util.JPAUtil;
 import edu.usc.csci587.csp.db.data.util.ParkingManager;
@@ -44,7 +51,16 @@ public class UserService {
 		}
 	}
 	
-	
+	@GET
+	@Path("/query/point")
+	public Response searchForUsers(@QueryParam("point") String point, @QueryParam("radius") Double radius)
+	{
+		EntityManager em = JPAUtil.createEntityManager();
+		Query query = getSearchForUserQuery(point, radius, em);
+	    List untypedResults = query.getResultList();
+	    
+	    return getUsersFromQuery(untypedResults);
+	}
 	@GET
 	@Path("/{id}/location")
 	public Response getLastUserReportedLocation(@PathParam("id") Long id)
@@ -87,5 +103,56 @@ public class UserService {
 		em.getTransaction().commit();
 		em.close();
 		return Response.status(200).build();
+	}
+	
+	private Query getSearchForUserQuery(String point, Double radius,
+			EntityManager em) {
+		Query query = em.createQuery("select u from User u where distance(u.location, :query_point) < :radius", User.class);
+	    query.setParameter("query_point", ParkingManager.wktToGeometry(point));
+	    query.setParameter("radius", radius);
+		return query;
+	}
+	
+	private Response getUsersFromQuery(List untypedResults) {
+		JSONArray users = new JSONArray();
+	    if(untypedResults != null)
+	    {
+	    	Iterator untypedResultsIterator = untypedResults.iterator();
+	    	while(untypedResultsIterator.hasNext())
+	    	{
+			    Object o = untypedResultsIterator.next();
+			    if(o != null && o instanceof User)
+			    {
+			    	User u =(User)o;	
+					JSONObject user = translateUserToJSONObject(u);
+					users.put(user);
+					
+					
+			    }
+	    	}
+	    	if(users.length() > 1)
+	    	{
+	    		return Response.status(200).entity(users.toString()).build();
+	    	}
+	    	else if(users.length() == 1)
+	    	{
+	    		return Response.status(200).entity(users.get(0).toString()).build(); 
+	    	}
+	    	else
+	    	{
+	    		return Response.status(200).entity("[]").build();
+	    	}
+	    	
+	    }
+		return Response.status(404).build();
+	}
+	
+	private JSONObject translateUserToJSONObject(User u) {
+		JSONObject user = new JSONObject();
+		user.put("id", u.getId());
+		user.put("location", u.getLocation().toText());
+		user.put("name", u.getName());
+		user.put("timestamp", u.getTimestamp());
+		return user;
 	}
 }
