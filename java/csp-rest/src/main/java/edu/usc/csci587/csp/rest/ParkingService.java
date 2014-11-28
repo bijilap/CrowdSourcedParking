@@ -166,12 +166,35 @@ public class ParkingService {
 	    return getParkingGaragesFromQuery(untypedResults);
 	}
 	
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/query/nearest")
+	@SuppressWarnings("rawtypes")
+	public Response searchForNearestParkingGarages(@QueryParam("count") Integer count, @QueryParam("userid") String userId)
+	{
+		System.out.println("looking in for " + count + " parking garages near userid " + userId );
+		
+		EntityManager em = JPAUtil.createEntityManager();
+		Query query = getSearchForNearestParkingGarageQuery(count, userId, em);
+	    List untypedResults = query.getResultList();
+	    
+	    return getParkingGaragesFromQuery(untypedResults);
+	}
+	
+	
 	private Query getSearchForParkingGarageByNameQuery(String point, Double radius, String name,
 			EntityManager em) {
 		Query query = em.createQuery("select p from Parking p where p.name=:name and distance(p.location, :query_point) < :radius", Parking.class);
 	    query.setParameter("query_point", ParkingManager.wktToGeometry(point));
 	    query.setParameter("radius", radius);
 	    query.setParameter("name", name);
+		return query;
+	}
+	private Query getSearchForNearestParkingGarageQuery( Integer count, String userId,
+			EntityManager em) {
+		Query query = em.createNativeQuery("select * from Parking p where SDO_NN( p.location, (select u.location from csp_user u where u.id=:userid), 'sdo_num_res=' || TO_CHAR(:count)) = 'TRUE'", Parking.class);
+	    query.setParameter("count", count);
+	    query.setParameter("userid", userId);
 		return query;
 	}
 	
