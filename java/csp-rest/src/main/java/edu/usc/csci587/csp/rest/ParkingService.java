@@ -181,6 +181,28 @@ public class ParkingService {
 	    return getParkingGaragesFromQuery(untypedResults);
 	}
 	
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/query/cheapest")
+	@SuppressWarnings("rawtypes")
+	public Response searchForCheapestParkingGarages(@QueryParam("hours") Double hours, @QueryParam("userid") String userId)
+	{
+		System.out.println("looking for cheapest parking garages near userid " + userId );
+		
+		EntityManager em = JPAUtil.createEntityManager();
+		Query query = getSearchForCheapestParkingGarageQuery(hours, userId, em);
+	    List untypedResults = query.getResultList();
+	    
+	    return getParkingGaragesFromQuery(untypedResults);
+	}
+	
+	private Query getSearchForCheapestParkingGarageQuery( Double hours, String userId,
+			EntityManager em) {
+		Query query = em.createNativeQuery("select p.*, case when (p.pricepermin*:hours*60 <p.priceperhour* :hours and :hours> 1 or p.pricepermin*:hours*60 < p.priceperhour) and p.pricepermin*:hours*60 < p.priceperday then p.pricepermin*:hours*60 when (p.priceperhour * :hours < p.priceperday and :hours> 1) then p.priceperhour*:hours else p.priceperday end as price from Parking p where SDO_WITHIN_DISTANCE(p.location, (select u.location from csp_user u where u.id=:userid), 'distance = 2000') = 'TRUE' order by price", Parking.class);
+	    query.setParameter("hours", hours);
+	    query.setParameter("userid", userId);
+		return query;
+	}
 	
 	private Query getSearchForParkingGarageByNameQuery(String point, Double radius, String name,
 			EntityManager em) {
@@ -224,13 +246,9 @@ public class ParkingService {
 					
 			    }
 	    	}
-	    	if(parkingGarages.length() > 1)
+	    	if(parkingGarages.length() > 0)
 	    	{
 	    		return Response.status(200).entity(parkingGarages.toString()).build();
-	    	}
-	    	else if(parkingGarages.length() == 1)
-	    	{
-	    		return Response.status(200).entity(parkingGarages.get(0).toString()).build(); 
 	    	}
 	    	else
 	    	{

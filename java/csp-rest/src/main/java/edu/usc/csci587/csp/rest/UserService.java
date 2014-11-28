@@ -147,13 +147,9 @@ public class UserService {
 					
 			    }
 	    	}
-	    	if(users.length() > 1)
+	    	if(users.length() > 0)
 	    	{
 	    		return Response.status(200).entity(users.toString()).build();
-	    	}
-	    	else if(users.length() == 1)
-	    	{
-	    		return Response.status(200).entity(users.get(0).toString()).build(); 
 	    	}
 	    	else
 	    	{
