@@ -18,7 +18,6 @@ import org.json.JSONObject;
 
 import com.vividsolutions.jts.geom.Point;
 
-import edu.usc.csci587.csp.db.data.Parking;
 import edu.usc.csci587.csp.db.data.User;
 import edu.usc.csci587.csp.db.data.util.JPAUtil;
 import edu.usc.csci587.csp.db.data.util.ParkingManager;
@@ -28,7 +27,7 @@ public class UserService {
 
 	@GET
 	@Path("/{id}")
-	public Response getUser(@PathParam("id") Long id)
+	public Response getUser(@PathParam("id") String id)
 	{
 		EntityManager em = JPAUtil.createEntityManager();
 		em.getTransaction().begin();
@@ -70,6 +69,7 @@ public class UserService {
 		return searchForUsersDirectly(point, radius);
 	}
 
+	@SuppressWarnings("rawtypes")
 	private Response searchForUsersDirectly(String point, Double radius) {
 		EntityManager em = JPAUtil.createEntityManager();
 		Query query = getSearchForUserQuery(point, radius, em);
@@ -79,7 +79,7 @@ public class UserService {
 	}
 	@GET
 	@Path("/{id}/location")
-	public Response getLastUserReportedLocation(@PathParam("id") Long id)
+	public Response getLastUserReportedLocation(@PathParam("id") String id)
 	{
 		System.out.println("Getting user reported location for " + id);
 		EntityManager em = JPAUtil.createEntityManager();
@@ -102,7 +102,7 @@ public class UserService {
 	
 	@POST
 	@Path("/{id}/location")
-	public Response updateUserLocation(@PathParam("id") Long id, @FormParam("location") String locationWKT, @FormParam("timestamp") Long timestamp)
+	public Response updateUserLocation(@PathParam("id") String id, @FormParam("location") String locationWKT, @FormParam("timestamp") Long timestamp)
 	{
 		System.out.println("Updating user reported location for " + id);
 		EntityManager em = JPAUtil.createEntityManager();
@@ -129,6 +129,7 @@ public class UserService {
 		return query;
 	}
 	
+	@SuppressWarnings("rawtypes")
 	protected static Response getUsersFromQuery(List untypedResults) {
 		JSONArray users = new JSONArray();
 	    if(untypedResults != null)

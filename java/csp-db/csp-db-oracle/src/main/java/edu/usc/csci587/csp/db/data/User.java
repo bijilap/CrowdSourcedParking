@@ -1,11 +1,9 @@
 package edu.usc.csci587.csp.db.data;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
 import com.vividsolutions.jts.geom.Point;
@@ -14,9 +12,9 @@ import com.vividsolutions.jts.geom.Point;
 @Table(name="CSP_USER")
 public class User {
 	@Id
-    @GeneratedValue(generator="increment")
-    @GenericGenerator(name="increment", strategy = "increment")
-    private Long id;
+   // @GeneratedValue(generator="increment")
+   // @GenericGenerator(name="increment", strategy = "increment")
+    private String id;
 
     private String name;
 
@@ -25,11 +23,11 @@ public class User {
     
     private Long timestamp; 
     
-    public Long getId() {
+    public String getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 

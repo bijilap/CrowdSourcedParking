@@ -61,7 +61,7 @@ public class ParkingService {
 		JSONObject parkingAsJSON = new JSONObject(parkingAsJSONString);
 		EntityManager em = JPAUtil.createEntityManager();
 		em.getTransaction().begin();
-		Parking parking = this.translateJSONObjectToParking(parkingAsJSON);
+		Parking parking = translateJSONObjectToParking(parkingAsJSON);
 		em.persist(parking);
 		em.getTransaction().commit();
 		em.close();
@@ -80,11 +80,11 @@ public class ParkingService {
 		Parking parking = em.find(Parking.class, Long.parseLong(id));
 		if(parking == null)
 		{
-			parking = this.translateJSONObjectToParking(parkingAsJSON);
+			parking = translateJSONObjectToParking(parkingAsJSON);
 		}
 		else
 		{
-			parking = this.mergeJSONObjectToParking(parking, parkingAsJSON);
+			parking = mergeJSONObjectToParking(parking, parkingAsJSON);
 		}
 		
 		em.persist(parking);
@@ -129,6 +129,7 @@ public class ParkingService {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/query/name")
+	@SuppressWarnings("rawtypes")
 	public Response getParkingByName(@QueryParam("name") String name, @QueryParam("point") String point, @QueryParam("radius") Double radius)
 	{
 	
@@ -153,6 +154,7 @@ public class ParkingService {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/query/point")
+	@SuppressWarnings("rawtypes")
 	public Response searchForParkingGarages(@QueryParam("point") String point, @QueryParam("radius") Double radius)
 	{
 		System.out.println("looking in " + point + " with radius " + radius );
@@ -180,6 +182,8 @@ public class ParkingService {
 	    query.setParameter("radius", radius);
 		return query;
 	}
+	
+	@SuppressWarnings("rawtypes")
 	private Response getParkingGaragesFromQuery(List untypedResults) {
 		JSONArray parkingGarages = new JSONArray();
 	    if(untypedResults != null)

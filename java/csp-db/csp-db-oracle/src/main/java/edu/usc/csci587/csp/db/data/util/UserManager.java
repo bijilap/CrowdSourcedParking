@@ -8,7 +8,6 @@ import com.vividsolutions.jts.geom.PrecisionModel;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 
-import edu.usc.csci587.csp.db.data.Parking;
 import edu.usc.csci587.csp.db.data.User;
 
 public class UserManager {
