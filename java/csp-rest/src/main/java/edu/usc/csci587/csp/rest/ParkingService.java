@@ -220,7 +220,7 @@ public class ParkingService {
 	}
 	private Query getSearchForCheapestParkingGarageQuery( Double hours, String userId,
 			EntityManager em) {
-		Query query = em.createNativeQuery("select p.*, case when (p.pricepermin*:hours*60 <p.priceperhour* :hours and :hours> 1 or p.pricepermin*:hours*60 < p.priceperhour) and p.pricepermin*:hours*60 < p.priceperday then p.pricepermin*:hours*60 when (p.priceperhour * :hours < p.priceperday and :hours> 1) then p.priceperhour*:hours else p.priceperday end as price from Parking p where SDO_WITHIN_DISTANCE(p.location, (select u.location from csp_user u where u.id=:userid), 'distance = 2000') = 'TRUE' order by price", Parking.class);
+		Query query = em.createNativeQuery("select * from (select p.*, case when (p.pricepermin*:hours*60 <p.priceperhour* :hours and :hours> 1 or p.pricepermin*:hours*60 < p.priceperhour) and p.pricepermin*:hours*60 < p.priceperday then p.pricepermin*:hours*60 when (p.priceperhour * :hours < p.priceperday and :hours> 1) then p.priceperhour*:hours else p.priceperday end as price from Parking p where SDO_WITHIN_DISTANCE(p.location, (select u.location from csp_user u where u.id=:userid), 'distance = 2000') = 'TRUE' order by price) where ROWNUM <=3", Parking.class);
 	    query.setParameter("hours", hours);
 	    query.setParameter("userid", userId);
 		return query;
